@@ -3,11 +3,15 @@ const seats = document.querySelectorAll('.row .seat:not(occupied)')
 const count = document.querySelector('.count')
 const total = document.querySelector('.total')
 const movieSelect = document.querySelector('.movie')
+populateUI()
 //turn it from a string into a number
 let ticketPrice = parseInt(movieSelect.value)
 
-
-
+//Save selected movie index and price
+function setMovieData(movieIndex, moviePrice) {
+    localStorage.setItem('selectedMovieIndex', movieIndex)
+    localStorage.setItem('selectedMoviePrice', moviePrice)
+}
 
 //Update Total and count
 function updateSelectedCount() {
@@ -22,13 +26,32 @@ function updateSelectedCount() {
 
     const selectedSeatsCount = selectedSeats.length
     count.innerText = selectedSeatsCount
-    total.textContent = selectedSeatsCount * ticketPrice
+    total.innerText = selectedSeatsCount * ticketPrice
 }
 
-//Save selected movie index and price
-function setMovieData(movieIndex, moviePrice) {
-    localStorage.setItem('selectedMovieIndex', movieIndex)
-    localStorage.setItem('selectedMoviePrice', moviePrice)
+//get data from localstorage and populate ui
+function populateUI() {
+    const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats'))
+
+    //checking if we have any selected seats in localstorage
+    if (selectedSeats !== null && selectedSeats.length > 0) {
+        seats.forEach((seat, index) => {
+            //checking to make sure we have a seat in the array
+            if (selectedSeats.indexOf(index) > -1) {
+                //make the seat selected
+                seat.classList.add('selected')
+            }
+        })
+    }
+
+    //get the selected movie from local storage 
+    const selectedMovieIndex = localStorage.getItem('selectedMovieIndex')
+    if (selectedMovieIndex !== null) {
+        movieSelect.selectedIndex = selectedMovieIndex
+    }
+
+
+
 }
 
 
@@ -37,6 +60,7 @@ movieSelect.addEventListener('change', (e) => {
     ticketPrice = parseInt(e.target.value)
     setMovieData(e.target.selectedIndex, e.target.value)
     updateSelectedCount()
+
 })
 
 
@@ -51,7 +75,8 @@ container.addEventListener('click', (e) => {
     }
 })
 
-
+//Initial count and total set
+updateSelectedCount()
 
 
 
